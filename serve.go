@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	username string = "lroolle"
+	githubUsername string = "lroolle"
 )
 
 type PageData struct {
@@ -26,7 +26,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		Host:        r.Host,
 		URL:         r.URL.Path,
 		PageTitle:   packageName,
-		UserName:    username,
+		UserName:    githubUsername,
 		PackageName: packageName,
 	}
 	if err := tmpl.Execute(w, data); err != nil {
@@ -37,7 +37,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/", indexHandler)
 	http.Handle("/favicon.ico", http.FileServer(http.Dir(".")))
+
 	if err := http.ListenAndServe(":7777", nil); err != nil {
-		log.Println("Server error", err)
+		log.Println("Server error:", err)
 	}
 }

@@ -1,7 +1,7 @@
-#+TITLE: go.lroolle.com
+#+TITLE: Go Adapt URLs
 #+DATE: 2020-11-01 20:02
 #+STARTUP: overview
-#+EXPORT_FILE_NAME: go-lroolle-com
+#+EXPORT_FILE_NAME: go-adapt-urls
 #+HUGO_WEIGHT: auto
 #+HUGO_BASE_DIR: ~/G/blog
 #+HUGO_AUTO_SET_LASTMOD: t
@@ -10,10 +10,112 @@
 #+HUGO_TAGS: notes golang
 
 
-A custom simple golang package server that redirects ~go.lroolle.com~ to ~github.com/lroolle~.
+~goadaptu(/go/ /ə'dæptjuː/)~: Go Adapt URLs is a simple server that allows you to set your custom import paths for your Go packages.
 
-For example:
+Which silly redirects ~https://example.com/packagename~ to ~https://github.com/username/packagename~.
+
+The official specifications in /go doc/:
+#+BEGIN_QUOTE
+-> [[https://golang.org/cmd/go/#hdr-Remote_import_paths][Remote_Import_Paths - The Go Programming Language]]
+#+END_QUOTE
+
+By deploy your own server with ~goadaptu~, you can:
+
+- Easily and adaptively, managing your package with ~go mod~ by:
 #+BEGIN_SRC sh :exports both :results output replace
-go get go.lroolle.com/hello
-# Same as: go get github.com/lroolle/hello
+go mod init yoursite.com/agrandpackage
 #+END_SRC
+
+- And after publishing:
+#+BEGIN_SRC sh :exports both :results output replace
+go get yoursite.com/fuckingawesomepackage@v1.15.9
+#+END_SRC
+
+- For example:
+#+BEGIN_SRC sh :exports both :results output replace
+go get go.lroolle.com/hellgo
+# Same as: go get github.com/lroolle/hellgo
+#+END_SRC
+
+- Similar but more powerful ~govanityurls~ by ~go.lsp.dev~
+
+For an alternative and /vanity/, in case you do not have a server, the project [[https://github.com/go-language-server/govanityurls][GitHub - go-language-server/govanityurls]] is a good choice to deploy on Google Cloud App Engine.
+
+* Start to Deploy Your Server
+** Prerequisite
+1. A simple relay server with public IP;
+2. A domain with records point to your server IP;
+
+** Config
+1. [[./nginx.conf][nginx.conf]]: your own ~server_name~ and ~ssl_certificate~ with
+   #+BEGIN_SRC conf :exports both
+    ssl_certificate      /data/goadaptu.crt;
+    ssl_certificate_key  /data/goadaptu.key;
+    server_name          go.lroolle.com;
+   #+END_SRC
+2. [[./serve.go][serve.go]]: your github username, https://github.com/<thisusername>
+   #+BEGIN_SRC go :exports both :imports "fmt"
+    const (
+        githubUsername string = "lroolle"
+    )
+   #+END_SRC
+
+** SSL Cert
+SSL is verified by default with ~go get~, if you do not want to fuck with cert,
+You can just ~go get -inscure yousite.com/yellpackage~.
+
+A easy way to get a issued CERT by ~acme.sh~:
+#+BEGIN_SRC sh :exports both :results output replace
+curl https://get.acme.sh | sh
+source ~/.bashrc
+#+END_SRC
+
+#+BEGIN_SRC sh :exports both :results output replace
+# May be stop nginx first: systemctl stop nginx
+
+acme.sh --issue -d "go.lroolle.com" --standalone -k ec-256 --force
+
+sudo mkdir /data
+acme.sh --installcert -d "go.lroolle.com" --fullchainpath /data/goadaptu.crt --keypath /data/goadaptu.key --ecc --force
+#+END_SRC
+
+
+** Run APP
+#+BEGIN_SRC sh :exports both :results output replace
+git clone https://github.com/lroolle/goadaptu.git
+
+cd goadaptu
+docker build -t goadaptu .
+docker run -d goadaptu
+#+END_SRC
+
+** Nginx
+#+BEGIN_SRC sh :exports both :results output replace
+sudo ln -s /path/to/your/goadaptu/nginx.conf /etc/nginx/conf/conf.d/goadaptu.conf
+
+/etc/nginx/sbin/nginx -t
+sudo systemctl restart nginx
+#+END_SRC
+
+*NOTE*: if there're multiple ssl sites listen on 443 port, you'll need Nginx compiled with ~TLS SNI support enabled~
+
+For example in my ubuntu server:
+#+BEGIN_SRC sh :exports both :results output replace
+/etc/nginx/sbin/nginx -V
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+nginx version: nginx/1.18.0
+built by gcc 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)
+built with OpenSSL 1.1.1g  21 Apr 2020
+TLS SNI support enabled
+configure arguments: --prefix=/etc/nginx --with-http_ssl_module --with-http_gzip_static_module --with-http_stub_status_module --with-pcre --with-http_realip_module --with-http_flv_module --with-http_mp4_module --with-http_secure_link_module --with-http_v2_module --with-cc-opt=-O3 --with-ld-opt=-ljemalloc --with-openssl=../openssl-1.1.1g
+#+END_EXAMPLE
+
+* Another Idea
+
+Yet, there's another idea, we can publish our github pages, why not publish our package with github pages.
+
+So that, there're no need for a Server, a SSL Cert, and a fucking Nginx.
+
+For example, ~go.lroolle.com/hello~ CNAME to -> ~lroolle.github.io/hello/index.html~, and in ~index.html~ simply put a head meta, then it should work!
