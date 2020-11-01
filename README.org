@@ -9,7 +9,6 @@
 #+HUGO_CATEGORIES: notes
 #+HUGO_TAGS: notes golang
 
-* go.lroolle.com
 
 A custom simple golang package server that redirects ~go.lroolle.com~ to ~github.com/lroolle~.
 
