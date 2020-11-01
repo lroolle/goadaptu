@@ -19,7 +19,7 @@ Which silly redirects ~https://example.com/packagename~ to ~https://github.com/u
 The official specifications about import path in /go doc/:
 
 #+BEGIN_QUOTE
--> [[https://golang.org/cmd/go/#hdr-Remote_import_paths][Remote_Import_Paths - The Go Programming Language]]
+-> [[https://golang.org/cmd/go/#hdr-Remote_import_paths][Remote Import Paths - The Go Programming Language]]
 #+END_QUOTE
 
 * Why?
@@ -42,28 +42,14 @@ By deploy your own server with ~goadaptu~, you can,
     # Same as: go get github.com/lroolle/hellgo
     #+END_SRC
 
-- A Similar but more powerful ~govanityurls~ by ~go.lsp.dev~
+- A Similar but more powerful project, the [[https://github.com/go-language-server/govanityurls][go-language-server/govanityurls]] by ~Go Language Server Team~
 
-    For an alternative and /vanity/, in case you do not have a server, the project [[https://github.com/go-language-server/govanityurls][GitHub - go-language-server/govanityurls]] is a good choice to deploy on Google Cloud App Engine.
+    For an alternative and /vanity/, or in case you do not have your server, ~govanityurls~  is a good choice to deploy on Google Cloud App Engine.
 
 * Start to Deploy Your Server
 ** Prerequisite
 1. A simple relay server with public IP;
 2. A domain with records point to your server IP;
-
-** Config
-1. [[./nginx.conf][nginx.conf]]: your own ~server_name~ and ~ssl_certificate~ with
-   #+BEGIN_SRC conf :exports both
-    ssl_certificate      /data/goadaptu.crt;
-    ssl_certificate_key  /data/goadaptu.key;
-    server_name          go.lroolle.com;
-   #+END_SRC
-2. [[./serve.go][serve.go]]: your github username, https://github.com/<thisusername>
-   #+BEGIN_SRC go :exports both :imports "fmt"
-    const (
-        githubUsername string = "lroolle"
-    )
-   #+END_SRC
 
 ** SSL Cert
 SSL is verified by default with ~go get~, if you do not want to fuck with cert,
@@ -84,12 +70,26 @@ sudo mkdir /data
 acme.sh --installcert -d "go.lroolle.com" --fullchainpath /data/goadaptu.crt --keypath /data/goadaptu.key --ecc --force
 #+END_SRC
 
+** Config
+1. [[./nginx.conf][nginx.conf]]: replace with your own ~server_name~ and ~ssl_certificate~ with
+   #+BEGIN_SRC conf :exports both
+    ssl_certificate      /data/goadaptu.crt;
+    ssl_certificate_key  /data/goadaptu.key;
+    server_name          go.lroolle.com;
+   #+END_SRC
+
+2. [[./serve.go][serve.go]]: replace with your github username, https://github.com/<thisusername>
+   #+BEGIN_SRC go :exports both :imports "fmt"
+    const (
+        githubUsername string = "lroolle"
+    )
+   #+END_SRC
 
 ** Run APP
 #+BEGIN_SRC sh :exports both :results output replace
-git clone https://github.com/lroolle/goadaptu.git
+git clone https://github.com/lroolle/goadaptu.git && cd goadaptu
 
-cd goadaptu
+# After Config
 docker build -t goadaptu .
 docker run -d goadaptu
 #+END_SRC

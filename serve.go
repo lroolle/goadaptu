@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	// TODO: Config file
 	githubUsername string = "lroolle"
 )
 
@@ -29,6 +30,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		UserName:    githubUsername,
 		PackageName: packageName,
 	}
+
 	if err := tmpl.Execute(w, data); err != nil {
 		log.Println("Executing index template:", err)
 	}
@@ -37,8 +39,5 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/", indexHandler)
 	http.Handle("/favicon.ico", http.FileServer(http.Dir(".")))
-
-	if err := http.ListenAndServe(":7777", nil); err != nil {
-		log.Println("Server error:", err)
-	}
+	log.Fatal(http.ListenAndServe(":7777", nil))
 }
