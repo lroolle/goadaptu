@@ -1,0 +1,19 @@
+#+TITLE: go.lroolle.com
+#+DATE: 2020-11-01 20:02
+#+STARTUP: overview
+#+EXPORT_FILE_NAME: go-lroolle-com
+#+HUGO_WEIGHT: auto
+#+HUGO_BASE_DIR: ~/G/blog
+#+HUGO_AUTO_SET_LASTMOD: t
+#+HUGO_SECTION: notes
+#+HUGO_CATEGORIES: notes
+#+HUGO_TAGS: notes golang
+
+* go.lroolle.com
+
+A custom simple golang package server that redirects ~go.lroolle.com~ to ~github.com/lroolle~.
+
+For example:
+#+BEGIN_SRC sh :exports both :results output replace
+go get go.lroolle.com/hello
+#+END_SRC
