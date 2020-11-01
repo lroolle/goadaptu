@@ -16,4 +16,5 @@ A custom simple golang package server that redirects ~go.lroolle.com~ to ~github
 For example:
 #+BEGIN_SRC sh :exports both :results output replace
 go get go.lroolle.com/hello
+# Same as: go get github.com/lroolle/hello
 #+END_SRC
